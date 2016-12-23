@@ -19,9 +19,9 @@ public class MainActivity extends WearableActivity {
     private ImageButton mResetButton;
     private ImageButton mMinusButton;
 
-    private int counterValue = 0;
+    private int counterValue = -1;
     private int tawaafValue = 0;
-
+    private Long tsLong;
 
     @Override
     protected void onStart() {
@@ -33,6 +33,7 @@ public class MainActivity extends WearableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setAmbientEnabled();
+        tsLong = System.currentTimeMillis();
 
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
         mHeadingView = (TextView) findViewById(R.id.heading);
@@ -44,11 +45,16 @@ public class MainActivity extends WearableActivity {
         mContainerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (counterValue>5) {
-                    tawaafComplete();
-                }else counterValue+=1;
-                Log.d("MainActivity",Integer.toString(counterValue));
-                updateDisplay();
+                if (counterValue<0||System.currentTimeMillis()-tsLong>30000) {
+                    tsLong = System.currentTimeMillis();
+                    if (counterValue > 5) {
+                        tawaafComplete();
+                    } else counterValue += 1;
+                    Log.d("MainActivity", Integer.toString(counterValue));
+                    updateDisplay();
+                } else {
+                    tooQuick();
+                }
             }
         });
 
@@ -72,13 +78,22 @@ public class MainActivity extends WearableActivity {
     }
 
     private void tawaafComplete() {
-        counterValue = 0;
+        counterValue = -1;
         tawaafValue+=1;
         Intent intent = new Intent(this, ConfirmationActivity.class);
         intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
                 ConfirmationActivity.SUCCESS_ANIMATION);
         intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE,
                 getString(R.string.complete));
+        startActivity(intent);
+    }
+
+    private void tooQuick() {
+        Intent intent = new Intent(this, ConfirmationActivity.class);
+        intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
+                ConfirmationActivity.FAILURE_ANIMATION);
+        intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE,
+                getString(R.string.too_quick));
         startActivity(intent);
     }
 
@@ -101,8 +116,16 @@ public class MainActivity extends WearableActivity {
     }
 
     private void updateDisplay() {
-        mCounterView.setText(Integer.toString(counterValue));
-        mFooterView.setText(Integer.toString(tawaafValue));
+        if (counterValue>0){
+            mCounterView.setText(Integer.toString(counterValue));
+        } else {
+            mCounterView.setText(R.string.initial_text);
+        }
+        if (counterValue>0) {
+            mFooterView.setText(Integer.toString(tawaafValue));
+        } else {
+            mCounterView.setText(R.string.tawaaf_total);
+        }
         /*if (isAmbient()) {
             mContainerView.setBackgroundColor(getResources().getColor(android.R.color.black));
             mHeadingView.setTextColor(getResources().getColor(android.R.color.white));
