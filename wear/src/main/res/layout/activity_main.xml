@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.wearable.view.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.livemasjid.tawaafonwear.MainActivity"
+    tools:deviceIds="wear"
+    android:background="?android:attr/colorAccent">
+
+    <TextView
+        android:id="@+id/heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:layout_gravity="center_horizontal|top"
+        android:textColor="@color/white"
+        app:layout_box="all"
+        android:textStyle="normal|bold"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/initial_text"
+        android:textColor="@color/white"
+        android:textSize="60sp"
+        app:layout_box="all" />
+
+    <TextView
+        android:id="@+id/footer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/tawaaf_total"
+        android:layout_gravity="center_horizontal|bottom"
+        android:textColor="@color/white"
+        app:layout_box="all" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:id="@+id/resetbutton"
+        android:src="@mipmap/ic_cached_black_24dp"
+        android:background="?android:attr/colorAccent"
+        android:tint="@color/white"
+        android:contentDescription="reset"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|start"
+        android:id="@+id/minusbutton"
+        android:src="@mipmap/ic_exposure_neg_1_black_24dp"
+        android:background="?android:attr/colorAccent"
+        android:tint="@color/white"
+        android:contentDescription="decrement"/>
+
+</android.support.wearable.view.BoxInsetLayout>
