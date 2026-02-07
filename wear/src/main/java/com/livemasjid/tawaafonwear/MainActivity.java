@@ -8,7 +8,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.util.Log;
 import android.content.Intent;
-import android.support.wearable.activity.ConfirmationActivity;
+import androidx.wear.activity.ConfirmationActivity;
 
 public class MainActivity extends WearableActivity {
 
