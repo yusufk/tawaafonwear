@@ -28,5 +28,5 @@ dependencies {
     compileOnly 'com.google.android.wearable:wearable:2.9.0'
     
     // Modern Ambient Mode support
-    implementation "androidx.wear:wear-ongoing:1.0.0"
+    implementation "androidx.wear:wear-ongoing:1.1.0"
 }
