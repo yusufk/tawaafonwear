@@ -19,6 +19,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+// Fix for Kotlin duplicate class errors (stdlib-jdk7/jdk8 are merged into stdlib since 1.8.0)
+configurations.all {
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
 }
 
 dependencies {
@@ -35,4 +47,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
     androidTestImplementation 'androidx.test:runner:1.7.0'
     androidTestImplementation 'androidx.test:core:1.7.0'
+    androidTestImplementation 'androidx.test:monitor:1.7.1'
+
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.22"
 }

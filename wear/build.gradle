@@ -5,7 +5,7 @@ android {
     compileSdkVersion 36
     defaultConfig {
         applicationId "com.livemasjid.tawaafonwear"
-        minSdkVersion 23
+        minSdkVersion 25
         targetSdkVersion 36
         versionCode 3
         versionName "1.2"
@@ -26,4 +26,7 @@ dependencies {
     implementation 'com.google.android.support:wearable:2.9.0'
     implementation 'com.google.android.gms:play-services-wearable:19.0.0'
     compileOnly 'com.google.android.wearable:wearable:2.9.0'
+    
+    // Modern Ambient Mode support
+    implementation "androidx.wear:wear-ongoing:1.0.0"
 }

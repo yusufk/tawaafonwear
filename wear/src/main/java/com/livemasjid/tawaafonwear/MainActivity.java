@@ -1,85 +1,128 @@
 package com.livemasjid.tawaafonwear;
 
 import android.os.Bundle;
-import android.support.wearable.activity.WearableActivity;
-import android.support.wearable.view.BoxInsetLayout;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.util.Log;
 import android.content.Intent;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.wear.activity.ConfirmationActivity;
+import androidx.wear.ambient.AmbientLifecycleObserver;
+import androidx.wear.ambient.AmbientLifecycleObserverKt;
+import androidx.core.content.ContextCompat;
 
-public class MainActivity extends WearableActivity {
+public class MainActivity extends AppCompatActivity {
 
-    private BoxInsetLayout mContainerView;
+    private View mContainerView;
     private TextView mHeadingView;
     private TextView mCounterView;
     private TextView mFooterView;
     private ImageButton mResetButton;
     private ImageButton mMinusButton;
+    private View mGreenLine;
 
-    private int counterValue = -1;
+    private int counterValue = 0;
     private int tawaafValue = 0;
-    private Long tsLong;
+    private long lastClickTime = 0;
+    private static final long DEBOUNCE_TIME = 30000; // 30 seconds
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
+    private AmbientLifecycleObserver ambientObserver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setAmbientEnabled();
-        tsLong = System.currentTimeMillis();
 
-        mContainerView = (BoxInsetLayout) findViewById(R.id.container);
-        mHeadingView = (TextView) findViewById(R.id.heading);
-        mCounterView = (TextView) findViewById(R.id.counter);
-        mFooterView = (TextView) findViewById(R.id.footer);
-        mResetButton = (ImageButton) findViewById(R.id.resetbutton);
-        mMinusButton = (ImageButton) findViewById(R.id.minusbutton);
-
-        mContainerView.setOnClickListener(new View.OnClickListener() {
+        ambientObserver = AmbientLifecycleObserverKt.AmbientLifecycleObserver(this, new AmbientLifecycleObserver.AmbientLifecycleCallback() {
             @Override
-            public void onClick(View v) {
-                if (counterValue<0||System.currentTimeMillis()-tsLong>30000) {
-                    tsLong = System.currentTimeMillis();
-                    if (counterValue > 5) {
-                        tawaafComplete();
-                    } else counterValue += 1;
-                    Log.d("MainActivity", Integer.toString(counterValue));
-                    updateDisplay();
-                } else {
-                    tooQuick();
-                }
+            public void onEnterAmbient(@NonNull AmbientLifecycleObserver.AmbientDetails ambientDetails) {
+                updateDisplay();
+            }
+
+            @Override
+            public void onExitAmbient() {
+                updateDisplay();
+            }
+
+            @Override
+            public void onUpdateAmbient() {
+                updateDisplay();
+            }
+        });
+        getLifecycle().addObserver(ambientObserver);
+
+        mContainerView = findViewById(R.id.container);
+        mHeadingView = findViewById(R.id.heading);
+        mCounterView = findViewById(R.id.counter);
+        mFooterView = findViewById(R.id.footer);
+        mResetButton = findViewById(R.id.resetbutton);
+        mMinusButton = findViewById(R.id.minusbutton);
+        mGreenLine = findViewById(R.id.green_line);
+
+        final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
+                handleTap(false);
+                return true;
+            }
+
+            @Override
+            public void onLongPress(@NonNull MotionEvent e) {
+                handleTap(true);
             }
         });
 
-        mResetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                counterValue = 0;
+        mContainerView.setOnTouchListener((v, event) -> {
+            if (gestureDetector.onTouchEvent(event)) {
+                return true;
+            }
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                v.performClick();
+            }
+            return true;
+        });
+
+        mResetButton.setOnClickListener(v -> {
+            counterValue = 0;
+            updateDisplay();
+        });
+
+        mMinusButton.setOnClickListener(v -> {
+            if (counterValue > 0){
+                counterValue -= 1;
                 updateDisplay();
             }
         });
 
-        mMinusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (counterValue > 0){
-                    counterValue -= 1;
-                    updateDisplay();
-                }
-            }
-        });
+        updateDisplay();
+    }
+
+    private void handleTap(boolean isLongPress) {
+        long currentTime = System.currentTimeMillis();
+        if (isLongPress || (currentTime - lastClickTime > DEBOUNCE_TIME)) {
+            incrementCounter();
+            lastClickTime = currentTime;
+        } else {
+            showTooQuick();
+        }
+    }
+
+    private void incrementCounter() {
+        counterValue++;
+        if (counterValue > 7) {
+            tawaafComplete();
+        } else {
+            updateDisplay();
+        }
     }
 
     private void tawaafComplete() {
-        counterValue = -1;
-        tawaafValue+=1;
+        counterValue = 1;
+        tawaafValue += 1;
+        updateDisplay();
         Intent intent = new Intent(this, ConfirmationActivity.class);
         intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
                 ConfirmationActivity.SUCCESS_ANIMATION);
@@ -88,52 +131,40 @@ public class MainActivity extends WearableActivity {
         startActivity(intent);
     }
 
-    private void tooQuick() {
+    private void showTooQuick() {
         Intent intent = new Intent(this, ConfirmationActivity.class);
         intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
                 ConfirmationActivity.FAILURE_ANIMATION);
         intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE,
-                getString(R.string.too_quick));
+                getString(R.string.too_quick) + "\nLong press to override");
         startActivity(intent);
     }
 
-    @Override
-    public void onEnterAmbient(Bundle ambientDetails) {
-        super.onEnterAmbient(ambientDetails);
-        updateDisplay();
-    }
-
-    @Override
-    public void onUpdateAmbient() {
-        super.onUpdateAmbient();
-        updateDisplay();
-    }
-
-    @Override
-    public void onExitAmbient() {
-        updateDisplay();
-        super.onExitAmbient();
-    }
-
     private void updateDisplay() {
-        if (counterValue>0){
-            mCounterView.setText(Integer.toString(counterValue));
+        boolean isAmbient = ambientObserver != null && ambientObserver.isAmbient();
+        
+        if (counterValue > 0) {
+            mCounterView.setText(String.valueOf(counterValue));
+            mCounterView.setTextSize(80);
         } else {
             mCounterView.setText(R.string.initial_text);
+            mCounterView.setTextSize(40);
         }
-        if (counterValue>0) {
-            mFooterView.setText(Integer.toString(tawaafValue));
-        } else {
-            mCounterView.setText(R.string.tawaaf_total);
-        }
-        /*if (isAmbient()) {
-            mContainerView.setBackgroundColor(getResources().getColor(android.R.color.black));
-            mHeadingView.setTextColor(getResources().getColor(android.R.color.white));
-            //mCounterView.setVisibility(View.VISIBLE);
-        } else {
+        mFooterView.setText(String.valueOf(tawaafValue));
+        
+        if (isAmbient) {
             mContainerView.setBackground(null);
-            mHeadingView.setTextColor(getResources().getColor(android.R.color.black));
-            //mCounterView.setVisibility(View.GONE);
-        }*/
+            mGreenLine.setVisibility(View.GONE);
+            mHeadingView.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+            mCounterView.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+            mFooterView.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+            mResetButton.setVisibility(View.GONE);
+            mMinusButton.setVisibility(View.GONE);
+        } else {
+            mContainerView.setBackgroundResource(R.drawable.tawaaf);
+            mGreenLine.setVisibility(View.VISIBLE);
+            mResetButton.setVisibility(View.VISIBLE);
+            mMinusButton.setVisibility(View.VISIBLE);
+        }
     }
 }

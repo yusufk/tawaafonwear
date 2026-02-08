@@ -1,62 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.wearable.view.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/tawaaf"
     tools:context="com.livemasjid.tawaafonwear.MainActivity"
-    tools:deviceIds="wear"
-    android:background="?android:attr/colorAccent">
+    tools:deviceIds="wear">
 
-    <TextView
-        android:id="@+id/heading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:layout_gravity="center_horizontal|top"
-        android:textColor="@color/white"
-        app:layout_box="all"
-        android:textStyle="normal|bold"
-        android:textSize="18sp" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_boxedEdges="all">
 
-    <TextView
-        android:id="@+id/counter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/initial_text"
-        android:textColor="@color/white"
-        android:textSize="60sp"
-        app:layout_box="all" />
+        <!-- Center anchor for the green line -->
+        <View
+            android:id="@+id/center_anchor"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:layout_centerInParent="true" />
 
-    <TextView
-        android:id="@+id/footer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/tawaaf_total"
-        android:layout_gravity="center_horizontal|bottom"
-        android:textColor="@color/white"
-        app:layout_box="all" />
+        <!-- Green Starting Line - Rotated to ~4:30 position (South-East) -->
+        <View
+            android:id="@+id/green_line"
+            android:layout_width="4dp"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/center_anchor"
+            android:background="#00FF00"
+            android:rotation="-45"
+            android:transformPivotX="2dp"
+            android:transformPivotY="0dp" />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end"
-        android:id="@+id/resetbutton"
-        android:src="@mipmap/ic_cached_black_24dp"
-        android:background="?android:attr/colorAccent"
-        android:tint="@color/white"
-        android:contentDescription="reset"/>
+        <TextView
+            android:id="@+id/heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:shadowColor="@android:color/black"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
+            android:text="@string/app_name"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|start"
-        android:id="@+id/minusbutton"
-        android:src="@mipmap/ic_exposure_neg_1_black_24dp"
-        android:background="?android:attr/colorAccent"
-        android:tint="@color/white"
-        android:contentDescription="decrement"/>
+        <TextView
+            android:id="@+id/counter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:shadowColor="@android:color/black"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="4"
+            android:text="@string/initial_text"
+            android:textColor="@android:color/white"
+            android:textSize="40sp"
+            android:textStyle="bold" />
 
-</android.support.wearable.view.BoxInsetLayout>
+        <TextView
+            android:id="@+id/footer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="8dp"
+            android:shadowColor="@android:color/black"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
+            android:text="@string/tawaaf_total"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <ImageButton
+            android:id="@+id/resetbutton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="reset"
+            android:src="@mipmap/ic_cached_black_24dp"
+            app:tint="@android:color/white" />
+
+        <ImageButton
+            android:id="@+id/minusbutton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="decrement"
+            android:src="@mipmap/ic_exposure_neg_1_black_24dp"
+            app:tint="@android:color/white" />
+
+    </RelativeLayout>
+
+</androidx.wear.widget.BoxInsetLayout>
